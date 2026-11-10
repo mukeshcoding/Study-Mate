@@ -1,0 +1,65 @@
+{
+  "name": "Task",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "title": "Title"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes"
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Due Date"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "urgent"
+      ],
+      "default": "medium",
+      "title": "Priority"
+    },
+    "subject_id": {
+      "type": "string",
+      "title": "Subject Id"
+    },
+    "subject_name": {
+      "type": "string",
+      "title": "Subject Name"
+    },
+    "completed": {
+      "type": "boolean",
+      "default": false,
+      "title": "Completed"
+    },
+    "completed_date": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Completed Date"
+    }
+  },
+  "required": [
+    "title"
+  ],
+  "rls": {
+    "read": {
+      "created_by_id": "{{user.id}}"
+    },
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}
