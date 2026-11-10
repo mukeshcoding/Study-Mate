@@ -1,5 +1,5 @@
 import React, { useRef, useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { appApi } from "@/api/appClient";
 import { useAuth } from "@/lib/AuthContext";
 import { useProfile } from "@/lib/profileContext";
 import { useSubjects, invalidateSubjects } from "@/lib/useSubjects";
@@ -12,7 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Image as Img } from "@/components/ui/image";
-import { Camera, Plus, Trash2, LogOut, Award, BookMarked, Moon, Sun, Monitor, Loader2 } from "lucide-react";
+import { Camera, Plus, Trash2, LogOut, Moon, Sun, Monitor, Loader2 } from "lucide-react";
 import { COLOR_OPTIONS, colorClasses } from "@/lib/colors";
 import { toast } from "@/components/ui/use-toast";
 
@@ -52,7 +52,7 @@ export default function Profile() {
     if (!file) return;
     setUploading(true);
     try {
-      const { file_url } = await base44.integrations.Core.UploadPublicFile({ file });
+      const { file_url } = await appApi.storage.uploadPublicFile({ file });
       await updateProfile({ avatar_url: file_url });
       toast({ title: "Photo updated" });
     } catch (err) { toast({ title: "Upload failed", description: err.message }); }
@@ -67,7 +67,7 @@ export default function Profile() {
   const addSubject = async () => {
     const n = newSubject.trim();
     if (!n) return;
-    await base44.entities.Subject.create({ name: n, color: newColor });
+    await appApi.entities.Subject.create({ name: n, color: newColor });
     invalidateSubjects();
     refreshSubjects();
     setNewSubject("");
@@ -75,7 +75,7 @@ export default function Profile() {
   };
 
   const removeSubject = async (id) => {
-    await base44.entities.Subject.delete(id);
+    await appApi.entities.Subject.delete(id);
     invalidateSubjects();
     refreshSubjects();
   };
@@ -84,13 +84,13 @@ export default function Profile() {
     setDeleting(true);
     try {
       await Promise.all([
-        base44.entities.Task.deleteMany({}),
-        base44.entities.Exam.deleteMany({}),
-        base44.entities.StudySession.deleteMany({}),
-        base44.entities.Habit.deleteMany({}),
-        base44.entities.HabitLog.deleteMany({}),
-        base44.entities.Note.deleteMany({}),
-        base44.entities.Subject.deleteMany({}),
+        appApi.entities.Task.deleteMany({}),
+        appApi.entities.Exam.deleteMany({}),
+        appApi.entities.StudySession.deleteMany({}),
+        appApi.entities.Habit.deleteMany({}),
+        appApi.entities.HabitLog.deleteMany({}),
+        appApi.entities.Note.deleteMany({}),
+        appApi.entities.Subject.deleteMany({}),
       ]);
       await updateProfile({ xp: 0, level: 1, current_streak: 0, longest_streak: 0, last_study_day: null, daily_study_minutes: 0, daily_study_day: null, goal_met_day: null, earned_achievements: [] });
       invalidateSubjects();
@@ -101,7 +101,7 @@ export default function Profile() {
     finally { setDeleting(false); }
   };
 
-  const logout = () => base44.auth.logout(window.location.origin);
+  const logout = () => appApi.auth.logout(window.location.origin);
 
   const THEMES = [
     { key: "dark", label: "Dark", icon: Moon },

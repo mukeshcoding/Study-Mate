@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { base44 } from "@/api/base44Client";
+import { appApi } from "@/api/appClient";
 import { useProfile } from "@/lib/profileContext";
 import { useSubjects } from "@/lib/useSubjects";
 import { dayStr } from "@/lib/gamification";
@@ -24,8 +24,8 @@ export default function Home() {
   const load = useCallback(async () => {
     try {
       const [ts, ex] = await Promise.all([
-        base44.entities.Task.list("-created_date", 200),
-        base44.entities.Exam.filter({ completed: false }, "exam_date", 50),
+        appApi.entities.Task.list("-created_date", 200),
+        appApi.entities.Exam.filter({ completed: false }, "exam_date", 50),
       ]);
       setTasks(ts || []);
       const upcoming = (ex || []).filter((e) => new Date(e.exam_date).getTime() > Date.now()).sort((a, b) => new Date(a.exam_date) - new Date(b.exam_date));
@@ -48,7 +48,7 @@ export default function Home() {
   const nextExam = exams[0] ? { ...exams[0], color: subjectColor(exams[0].subject_id) } : null;
 
   const toggleTask = async (t) => {
-    const updated = await base44.entities.Task.update(t.id, { completed: true, completed_date: new Date().toISOString() });
+    const updated = await appApi.entities.Task.update(t.id, { completed: true, completed_date: new Date().toISOString() });
     setTasks((p) => p.map((x) => (x.id === t.id ? updated : x)));
     await awardXp(10);
     await recordActivity();

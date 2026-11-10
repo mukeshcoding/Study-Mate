@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { appApi } from "@/api/appClient";
 import { useProfile } from "@/lib/profileContext";
 import { invalidateSubjects } from "@/lib/useSubjects";
 import { Button } from "@/components/ui/button";
@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
 import { BookOpen, ArrowRight, Check, Plus, X } from "lucide-react";
-import { COLOR_OPTIONS, colorClasses } from "@/lib/colors";
+import { COLOR_OPTIONS } from "@/lib/colors";
 
 const SUGGESTED = ["Mathematics", "Physics", "Chemistry", "Biology", "History", "English", "Computer Science", "Economics"];
 
@@ -45,7 +45,7 @@ export default function Onboarding() {
         onboarding_complete: true,
       });
       if (subjects.length) {
-        await base44.entities.Subject.bulkCreate(subjects);
+        await appApi.entities.Subject.bulkCreate(subjects);
         invalidateSubjects();
       }
       navigate("/");

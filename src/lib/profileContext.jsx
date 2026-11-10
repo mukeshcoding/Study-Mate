@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from "react";
-import { base44 } from "@/api/base44Client";
+import { appApi } from "@/api/appClient";
 import { useAuth } from "@/lib/AuthContext";
 import {
   levelFromXp, levelProgress, computeStreak, dayStr, yesterdayStr,
@@ -54,6 +54,10 @@ function applyTheme(theme) {
   }
 }
 
+function saveProfile(partial) {
+  void appApi.auth.updateMe(partial).catch(() => {});
+}
+
 export function ProfileProvider({ children }) {
   const { user, isAuthenticated, authChecked } = useAuth();
   const [profile, setProfile] = useState(null);
@@ -62,7 +66,7 @@ export function ProfileProvider({ children }) {
 
   const refresh = useCallback(async () => {
     try {
-      const me = await base44.auth.me();
+      const me = await appApi.auth.me();
       meRef.current = me;
       const p = readProfile(me);
       setProfile(p);
@@ -90,22 +94,12 @@ export function ProfileProvider({ children }) {
     return () => mq.removeEventListener?.("change", handler);
   }, [profile?.theme]);
 
-  const persist = useCallback(async (partial) => {
-    setProfile((prev) => {
-      const next = { ...prev, ...partial };
-      try { base44.auth.updateMe(partial); } catch (e) { /* ignore */ }
-      return next;
-    });
-  }, []);
-
   const updateProfile = useCallback(async (partial) => {
-    if (partial.theme) applyTheme(partial.theme);
-    setProfile((prev) => {
-      const next = { ...prev, ...partial };
-      if (next.xp !== prev?.xp) next.level = levelFromXp(next.xp);
-      try { base44.auth.updateMe({ ...partial, level: next.level }); } catch (e) {}
-      return next;
-    });
+    const updates = { ...partial };
+    if (Object.hasOwn(updates, "xp")) updates.level = levelFromXp(updates.xp);
+    await appApi.auth.updateMe(updates);
+    if (updates.theme) applyTheme(updates.theme);
+    setProfile((prev) => ({ ...prev, ...updates }));
   }, []);
 
   const awardXp = useCallback(async (amount) => {
@@ -115,7 +109,7 @@ export function ProfileProvider({ children }) {
       const xp = (prev.xp || 0) + amount;
       const level = levelFromXp(xp);
       const leveledUp = level > (prev.level || 1);
-      try { base44.auth.updateMe({ xp, level }); } catch (e) {}
+      saveProfile({ xp, level });
       if (leveledUp) {
         toast({ title: `Level ${level} reached!`, description: "Keep up the great work." });
       }
@@ -136,7 +130,7 @@ export function ProfileProvider({ children }) {
       result = { streak, changed };
       const longest = Math.max(prev.longest_streak || 0, streak);
       const partial = { current_streak: streak, longest_streak: longest, last_study_day: today };
-      try { base44.auth.updateMe(partial); } catch (e) {}
+      saveProfile(partial);
       return { ...prev, ...partial };
     });
     return result;
@@ -155,7 +149,7 @@ export function ProfileProvider({ children }) {
       result = { dailyMinutes, goalMet };
       const partial = { daily_study_minutes: dailyMinutes, daily_study_day: today };
       if (goalMet) partial.goal_met_day = today;
-      try { base44.auth.updateMe(partial); } catch (e) {}
+      saveProfile(partial);
       return { ...prev, ...partial };
     });
     return result;
@@ -177,7 +171,7 @@ export function ProfileProvider({ children }) {
       newly = evaluateAchievements(ctx);
       if (!newly.length) return prev;
       const earned = [...(prev.earned_achievements || []), ...newly];
-      try { base44.auth.updateMe({ earned_achievements: earned }); } catch (e) {}
+      saveProfile({ earned_achievements: earned });
       return { ...prev, earned_achievements: earned };
     });
     newly.forEach((id) => {

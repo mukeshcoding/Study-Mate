@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { base44 } from "@/api/base44Client";
+import { appApi } from "@/api/appClient";
 
 let cache = null;
 let cacheTime = 0;
@@ -16,7 +16,7 @@ export function useSubjects() {
     if (cache && Date.now() - cacheTime < 60000) {
       setSubjects(cache);
     } else {
-      base44.entities.Subject.list()
+      appApi.entities.Subject.list()
         .then((s) => {
           cache = s || [];
           cacheTime = Date.now();
@@ -28,7 +28,7 @@ export function useSubjects() {
   }, []);
 
   const refresh = async () => {
-    const s = await base44.entities.Subject.list();
+    const s = await appApi.entities.Subject.list();
     cache = s || [];
     cacheTime = Date.now();
     listeners.forEach((x) => x(cache));

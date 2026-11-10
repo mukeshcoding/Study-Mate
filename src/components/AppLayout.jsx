@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Link, useLocation, useNavigate, Outlet } from "react-router-dom";
 import { Home, ListTodo, Timer, GraduationCap, MoreHorizontal, BarChart3, StickyNote, User, Plus, BookOpen } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";

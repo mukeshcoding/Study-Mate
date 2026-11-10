@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { appApi } from "@/api/appClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -78,7 +78,7 @@ export default function ExamDialog({ open, onClose, onSaved, exam }) {
       notes: notes.trim(),
     };
     try {
-      const result = exam ? await base44.entities.Exam.update(exam.id, payload) : await base44.entities.Exam.create({ ...payload, completed: false });
+      const result = exam ? await appApi.entities.Exam.update(exam.id, payload) : await appApi.entities.Exam.create({ ...payload, completed: false });
       onSaved(result);
       onClose();
     } catch (e) {} finally { setSaving(false); }

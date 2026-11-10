@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { appApi } from "@/api/appClient";
 import { useProfile } from "@/lib/profileContext";
 import { ACHIEVEMENTS } from "@/lib/gamification";
-import { BarChart3, StickyNote, BookOpen, User, Award, ChevronRight, Settings, BookMarked } from "lucide-react";
+import { BarChart3, StickyNote, BookOpen, User, Award, ChevronRight, BookMarked } from "lucide-react";
 
 const LINKS = [
   { to: "/stats", label: "Statistics", desc: "Your study analytics", icon: BarChart3, color: "text-indigo-300 bg-indigo-500/15 border-indigo-500/30" },
@@ -17,7 +17,7 @@ export default function More() {
   const [subjectsCount, setSubjectsCount] = useState(0);
 
   useEffect(() => {
-    base44.entities.Subject.list().then((s) => setSubjectsCount((s || []).length)).catch(() => {});
+    appApi.entities.Subject.list().then((s) => setSubjectsCount((s || []).length)).catch(() => {});
   }, []);
 
   const earned = new Set(profile?.earned_achievements || []);

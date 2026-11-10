@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { base44 } from "@/api/base44Client";
+import { appApi } from "@/api/appClient";
 import { useProfile } from "@/lib/profileContext";
-import { useSubjects } from "@/lib/useSubjects";
 import { dayStr, addDays } from "@/lib/gamification";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -31,7 +30,7 @@ function HabitDialog({ open, onClose, onSaved, habit }) {
     setSaving(true);
     try {
       const payload = { name: name.trim(), frequency, color, active: true, target_per_week: frequency === "daily" ? 7 : 3 };
-      const result = habit ? await base44.entities.Habit.update(habit.id, payload) : await base44.entities.Habit.create(payload);
+      const result = habit ? await appApi.entities.Habit.update(habit.id, payload) : await appApi.entities.Habit.create(payload);
       onSaved(result); onClose();
     } catch (e) {} finally { setSaving(false); }
   };
@@ -103,11 +102,11 @@ export default function Habits() {
 
   const load = useCallback(async () => {
     try {
-      const hs = await base44.entities.Habit.list("-created_date", 100);
+      const hs = await appApi.entities.Habit.list("-created_date", 100);
       setHabits(hs || []);
       if (hs?.length) {
         const ids = hs.map((h) => h.id);
-        const allLogs = await base44.entities.HabitLog.filter({ habit_id: { $in: ids } });
+        const allLogs = await appApi.entities.HabitLog.filter({ habit_id: { $in: ids } });
         const map = {};
         (allLogs || []).forEach((l) => { (map[l.habit_id] = map[l.habit_id] || []).push(l); });
         setLogsByHabit(map);
@@ -138,20 +137,20 @@ export default function Habits() {
     const logs = logsByHabit[h.id] || [];
     const todays = logs.find((l) => l.date === today);
     if (todays) {
-      await base44.entities.HabitLog.delete(todays.id);
+      await appApi.entities.HabitLog.delete(todays.id);
       setLogsByHabit((p) => ({ ...p, [h.id]: logs.filter((l) => l.id !== todays.id) }));
     } else {
-      const created = await base44.entities.HabitLog.create({ habit_id: h.id, date: today, completed: true });
+      const created = await appApi.entities.HabitLog.create({ habit_id: h.id, date: today, completed: true });
       setLogsByHabit((p) => ({ ...p, [h.id]: [...(p[h.id] || []), created] }));
       await awardXp(10);
       await recordActivity();
-      const allToday = await base44.entities.HabitLog.filter({ date: today });
+      const allToday = await appApi.entities.HabitLog.filter({ date: today });
       await syncAchievements({ habitsCompleted: (allToday || []).length, focusSessions: 0, tasksCompleted: 0 });
     }
   };
 
   const onDelete = async () => {
-    await base44.entities.Habit.delete(deleteId);
+    await appApi.entities.Habit.delete(deleteId);
     setHabits((p) => p.filter((x) => x.id !== deleteId));
     setDeleteId(null);
   };

@@ -4,7 +4,6 @@ import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes, Navigate, useLocation, Outlet } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
-import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import ScrollToTop from './components/ScrollToTop';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { ProfileProvider, useProfile } from '@/lib/profileContext';
@@ -53,18 +52,31 @@ function ProtectedLayout() {
 }
 
 const AuthenticatedApp = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
+  const { isLoadingAuth, authError, navigateToLogin, checkUserAuth } = useAuth();
 
-  if (isLoadingPublicSettings || isLoadingAuth) {
+  if (isLoadingAuth) {
     return <FullScreenSpinner />;
   }
 
   if (authError) {
-    if (authError.type === 'user_not_registered') {
-      return <UserNotRegisteredError />;
+    if (authError.type === 'configuration_error') {
+      return (
+        <div className="min-h-screen flex items-center justify-center bg-background p-6">
+          <p className="max-w-md text-center text-sm text-muted-foreground">{authError.message}</p>
+        </div>
+      );
     } else if (authError.type === 'auth_required') {
       navigateToLogin();
       return null;
+    } else if (authError.type === 'service_error') {
+      return (
+        <div className="min-h-screen flex flex-col items-center justify-center gap-4 bg-background p-6">
+          <p className="max-w-md text-center text-sm text-muted-foreground">{authError.message}</p>
+          <button className="text-sm font-medium text-primary hover:underline" onClick={() => void checkUserAuth()}>
+            Try again
+          </button>
+        </div>
+      );
     }
   }
 

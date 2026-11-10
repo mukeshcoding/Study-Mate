@@ -1,62 +1,30 @@
-# Base44 Project
+# StudyMate
 
-Use this repository to run and edit the app locally, then publish changes back through Base44.
+StudyMate is a React and Vite study planner. The frontend is hosted on Vercel; Supabase provides authentication, PostgreSQL data, and avatar storage.
 
-Any change pushed to the repo will also be reflected in the Base44 Builder.
+## Run locally
 
-## Prerequisites
+1. Install Node.js 20.19+ or 22.12+ and pnpm.
+2. Copy `.env.example` to `.env.local` and fill in the Supabase project URL and public anon/publishable key.
+3. Install dependencies with `pnpm install`.
+4. Start the app with `pnpm dev`.
 
-1. Clone the repository using the project's Git URL.
-2. Navigate to the project directory.
-3. Install dependencies: `npm install`.
-4. Install the Base44 CLI: `npm install -g base44@latest`.
-5. Install [Deno](https://docs.deno.com/runtime/getting_started/installation/) — the local Base44 backend runs on it.
+## Supabase setup
 
-Run `base44 --help` (or see the [CLI reference](https://docs.base44.com/developers/references/cli/commands/introduction)) for the full command surface.
+Apply `supabase/migrations/20261110000000_studymate_schema.sql` in a new Supabase project. Configure the Site URL and allowed auth redirects for the Vercel domain, enable email/password authentication, configure Google OAuth if required, and set custom SMTP with a verified sender domain before enabling production registration.
 
-## Run Locally
+Never put a Supabase service-role key in the frontend or in a `VITE_` environment variable. The browser app uses only the public anon/publishable key and database row-level security.
 
-Three commands, from the project root:
+## Vercel deployment
 
-```bash
-base44 login   # one-time per machine
-base44 link    # one-time per clone
-base44 dev     # local backend + frontend together
-```
+- Framework preset: Vite
+- Build command: `pnpm build`
+- Output directory: `dist`
+- Install command: `pnpm install`
+- Add `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` to the required Vercel environments.
 
-Open the frontend URL that `base44 dev` prints (typically `http://localhost:5173`).
+`vercel.json` routes client-side app paths back to `index.html`.
 
-Notes:
+## Moving from Base44
 
-- **Every fresh clone needs `base44 link`.** It writes `base44/.app.jsonc` (the app-id pointer), which is deliberately gitignored. Your app id is in the Builder URL (`app.base44.com/apps/<id>/...`); `base44 link --help` shows the non-interactive flags.
-- **`base44 dev` runs the frontend for you** (via `site.serveCommand` in this repo's `base44/config.jsonc`) — never run `npm run dev` yourself: alone it serves a UI with no backend behind it (`[base44] Proxy not enabled`, every `/api` call fails), and alongside `base44 dev` the second Vite silently takes the next port and you end up looking at the wrong one.
-- **The app must be published at least once for the UI to load under `base44 dev`.** The frontend boots by fetching app settings from the hosted app; before the first publish that fails and every page redirects to login. The local API works regardless.
-- Entities, functions, and auth run locally — entity data is **in-memory only**, wiped when `base44 dev` restarts. Everything else (Core integrations, OAuth login) is forwarded to your deployed app. Full breakdown: [Local development overview](https://docs.base44.com/developers/backend/overview/local-dev/local-development-overview).
-
-## Frontend Only, Hosted Backend
-
-To work on just the frontend against your app's live hosted backend:
-
-```bash
-base44 dev --remote
-```
-
-⚠️ In this mode writes go to your app's **production data** — plain `base44 dev` keeps everything local.
-
-## Publish Your Changes
-
-After pushing your changes to git, open the Base44 dashboard and publish the app:
-
-```bash
-base44 dashboard open
-```
-
-This repo syncs to Base44 through git, so publish from the dashboard rather than `base44 deploy` — a CLI deploy ships your local tree directly, bypassing the sync, and the deployed state silently diverges from the repo.
-
-## Docs & Support
-
-GitHub integration: [https://docs.base44.com/developers/app-code/local-development/github](https://docs.base44.com/developers/app-code/local-development/github)
-
-Local development: [https://docs.base44.com/developers/backend/overview/local-dev/local-development-overview](https://docs.base44.com/developers/backend/overview/local-dev/local-development-overview)
-
-Support: [https://app.base44.com/support](https://app.base44.com/support)
+See [`docs/base44-to-supabase-migration.md`](docs/base44-to-supabase-migration.md) for data export, account migration, email setup, preview verification, cutover, and rollback steps. Keep private exports out of Git and retain the Base44 project until the new production deployment is verified.

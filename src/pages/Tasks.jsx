@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { appApi } from "@/api/appClient";
 import { useProfile } from "@/lib/profileContext";
 import { useSubjects } from "@/lib/useSubjects";
 import { dayStr } from "@/lib/gamification";
@@ -42,7 +42,7 @@ export default function Tasks() {
 
   const load = useCallback(async () => {
     try {
-      const ts = await base44.entities.Task.list("-created_date", 500);
+      const ts = await appApi.entities.Task.list("-created_date", 500);
       setTasks(ts || []);
     } catch (e) {} finally { setLoading(false); }
   }, []);
@@ -89,10 +89,10 @@ export default function Tasks() {
 
   const toggleComplete = async (t) => {
     if (t.completed) {
-      const updated = await base44.entities.Task.update(t.id, { completed: false, completed_date: null });
+      const updated = await appApi.entities.Task.update(t.id, { completed: false, completed_date: null });
       setTasks((p) => p.map((x) => (x.id === t.id ? updated : x)));
     } else {
-      const updated = await base44.entities.Task.update(t.id, { completed: true, completed_date: new Date().toISOString() });
+      const updated = await appApi.entities.Task.update(t.id, { completed: true, completed_date: new Date().toISOString() });
       setTasks((p) => p.map((x) => (x.id === t.id ? updated : x)));
       await awardXp(10);
       await recordActivity();
@@ -102,7 +102,7 @@ export default function Tasks() {
   };
 
   const onDelete = async () => {
-    await base44.entities.Task.delete(deleteId);
+    await appApi.entities.Task.delete(deleteId);
     setTasks((p) => p.filter((x) => x.id !== deleteId));
     setDeleteId(null);
   };

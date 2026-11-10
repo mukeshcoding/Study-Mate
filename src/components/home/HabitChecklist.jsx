@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { appApi } from "@/api/appClient";
 import { Check, Repeat } from "lucide-react";
 import { useProfile } from "@/lib/profileContext";
-import { useSubjects } from "@/lib/useSubjects";
 import { colorClasses } from "@/lib/colors";
 import { dayStr } from "@/lib/gamification";
 
@@ -15,11 +14,11 @@ export default function HabitChecklist() {
 
   const load = async () => {
     try {
-      const hs = await base44.entities.Habit.filter({ active: true });
+      const hs = await appApi.entities.Habit.filter({ active: true });
       setHabits(hs || []);
       if (hs?.length) {
         const ids = hs.map((h) => h.id);
-        const allLogs = await base44.entities.HabitLog.filter({ habit_id: { $in: ids }, date: today });
+        const allLogs = await appApi.entities.HabitLog.filter({ habit_id: { $in: ids }, date: today });
         const map = {};
         (allLogs || []).forEach((l) => { map[l.habit_id] = l; });
         setLogs(map);
@@ -33,9 +32,9 @@ export default function HabitChecklist() {
     const existing = logs[h.id];
     if (existing) {
       setLogs((p) => { const n = { ...p }; delete n[h.id]; return n; });
-      await base44.entities.HabitLog.delete(existing.id);
+      await appApi.entities.HabitLog.delete(existing.id);
     } else {
-      const created = await base44.entities.HabitLog.create({ habit_id: h.id, date: today, completed: true });
+      const created = await appApi.entities.HabitLog.create({ habit_id: h.id, date: today, completed: true });
       setLogs((p) => ({ ...p, [h.id]: created }));
       await awardXp(10);
       await recordActivity();

@@ -1,8 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Check, ListTodo, ChevronRight } from "lucide-react";
-import { base44 } from "@/api/base44Client";
-import { useProfile } from "@/lib/profileContext";
+import { ListTodo, ChevronRight } from "lucide-react";
 import SubjectBadge from "@/components/SubjectBadge";
 import { PRIORITY_META } from "@/lib/colors";
 import { useSubjects } from "@/lib/useSubjects";

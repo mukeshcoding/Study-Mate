@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useCallback } from "react";
-import { base44 } from "@/api/base44Client";
+import { appApi } from "@/api/appClient";
 import { useSubjects } from "@/lib/useSubjects";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerFooter } from "@/components/ui/drawer";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Plus, Search, Pencil, Trash2, Pin, StickyNote, X } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Pin, StickyNote } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import SubjectBadge from "@/components/SubjectBadge";
 import EmptyState from "@/components/EmptyState";
@@ -33,7 +33,7 @@ function NoteDialog({ open, onClose, onSaved, note }) {
     const subj = subjects.find((s) => s.id === subjectId);
     const payload = { title: title.trim(), content: content.trim(), subject_id: subjectId || null, subject_name: subj?.name || null, pinned };
     try {
-      const result = note ? await base44.entities.Note.update(note.id, payload) : await base44.entities.Note.create(payload);
+      const result = note ? await appApi.entities.Note.update(note.id, payload) : await appApi.entities.Note.create(payload);
       onSaved(result); onClose();
     } catch (e) {} finally { setSaving(false); }
   };
@@ -105,7 +105,7 @@ export default function Notes() {
 
   const load = useCallback(async () => {
     try {
-      const ns = await base44.entities.Note.list("-created_date", 200);
+      const ns = await appApi.entities.Note.list("-created_date", 200);
       setNotes(ns || []);
     } catch (e) {} finally { setLoading(false); }
   }, []);
@@ -122,12 +122,12 @@ export default function Notes() {
   }, [notes, search]);
 
   const togglePin = async (n) => {
-    const updated = await base44.entities.Note.update(n.id, { pinned: !n.pinned });
+    const updated = await appApi.entities.Note.update(n.id, { pinned: !n.pinned });
     setNotes((p) => p.map((x) => (x.id === n.id ? updated : x)));
   };
 
   const onDelete = async () => {
-    await base44.entities.Note.delete(deleteId);
+    await appApi.entities.Note.delete(deleteId);
     setNotes((p) => p.filter((x) => x.id !== deleteId));
     setDeleteId(null);
   };

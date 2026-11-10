@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { base44 } from "@/api/base44Client";
+import { appApi } from "@/api/appClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -8,9 +8,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerFooter } from "@/components/ui/drawer";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useSubjects, invalidateSubjects } from "@/lib/useSubjects";
+import { useSubjects } from "@/lib/useSubjects";
 import { PRIORITY_META } from "@/lib/colors";
-import { Plus } from "lucide-react";
 
 function toLocalInput(d) {
   if (!d) return "";
@@ -97,8 +96,8 @@ export default function TaskDialog({ open, onClose, onSaved, task }) {
     };
     try {
       let result;
-      if (task) result = await base44.entities.Task.update(task.id, payload);
-      else result = await base44.entities.Task.create({ ...payload, completed: false });
+      if (task) result = await appApi.entities.Task.update(task.id, payload);
+      else result = await appApi.entities.Task.create({ ...payload, completed: false });
       onSaved(result);
       onClose();
     } catch (e) {} finally { setSaving(false); }

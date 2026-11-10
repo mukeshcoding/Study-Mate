@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { appApi } from "@/api/appClient";
 import { useSubjects } from "@/lib/useSubjects";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -23,7 +23,7 @@ export default function Exams() {
 
   const load = useCallback(async () => {
     try {
-      const es = await base44.entities.Exam.list("-exam_date", 200);
+      const es = await appApi.entities.Exam.list("-exam_date", 200);
       setExams(es || []);
     } catch (e) {} finally { setLoading(false); }
   }, []);
@@ -38,12 +38,12 @@ export default function Exams() {
   const completed = exams.filter((e) => e.completed || new Date(e.exam_date) <= new Date()).sort((a, b) => new Date(b.exam_date) - new Date(a.exam_date));
 
   const markDone = async (e) => {
-    const updated = await base44.entities.Exam.update(e.id, { completed: true });
+    const updated = await appApi.entities.Exam.update(e.id, { completed: true });
     setExams((p) => p.map((x) => (x.id === e.id ? updated : x)));
   };
 
   const onDelete = async () => {
-    await base44.entities.Exam.delete(deleteId);
+    await appApi.entities.Exam.delete(deleteId);
     setExams((p) => p.filter((x) => x.id !== deleteId));
     setDeleteId(null);
   };

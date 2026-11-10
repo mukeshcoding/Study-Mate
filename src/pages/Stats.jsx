@@ -1,11 +1,10 @@
 import React, { useEffect, useState, useMemo } from "react";
-import { base44 } from "@/api/base44Client";
+import { appApi } from "@/api/appClient";
 import { useProfile } from "@/lib/profileContext";
 import { useSubjects } from "@/lib/useSubjects";
 import { dayStr, addDays } from "@/lib/gamification";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, CartesianGrid } from "recharts";
 import { Timer, CheckCircle2, ListTodo, Flame, TrendingUp, BookOpen, Award } from "lucide-react";
-import { colorClasses } from "@/lib/colors";
 import EmptyState from "@/components/EmptyState";
 
 const CHART_COLORS = ["#6366F1", "#8B5CF6", "#10B981", "#F59E0B", "#EF4444", "#06B6D4", "#EC4899", "#F97316", "#14B8A6", "#3B82F6"];
@@ -22,10 +21,10 @@ export default function Stats() {
 
   useEffect(() => {
     Promise.all([
-      base44.entities.StudySession.list("-created_date", 1000),
-      base44.entities.Task.list("-created_date", 1000),
-      base44.entities.HabitLog.list("-created_date", 1000),
-      base44.entities.Habit.list("-created_date", 200),
+      appApi.entities.StudySession.list("-created_date", 1000),
+      appApi.entities.Task.list("-created_date", 1000),
+      appApi.entities.HabitLog.list("-created_date", 1000),
+      appApi.entities.Habit.list("-created_date", 200),
     ]).then(([s, t, l, h]) => {
       setSessions(s || []); setTasks(t || []); setLogs(l || []); setHabits(h || []);
     }).catch(() => {}).finally(() => setLoading(false));

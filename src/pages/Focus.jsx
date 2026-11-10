@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { appApi } from "@/api/appClient";
 import { useProfile } from "@/lib/profileContext";
 import { useSubjects } from "@/lib/useSubjects";
 import { Button } from "@/components/ui/button";
@@ -66,7 +66,7 @@ export default function Focus() {
       // record session
       try {
         const subj = subjects.find((s) => s.id === subjectId);
-        await base44.entities.StudySession.create({
+        await appApi.entities.StudySession.create({
           subject_id: subjectId || null,
           subject_name: subj?.name || null,
           duration_minutes: cfg.focus,
@@ -78,9 +78,9 @@ export default function Focus() {
         await awardXp(20);
         await addDailyStudy(cfg.focus);
         await recordActivity();
-        const sessions = await base44.entities.StudySession.list("-created_date", 500);
+        const sessions = await appApi.entities.StudySession.list("-created_date", 500);
         const focusCount = (sessions || []).length;
-        const habits = await base44.entities.HabitLog.filter({ date: new Date().toISOString().slice(0,10) });
+        const habits = await appApi.entities.HabitLog.filter({ date: new Date().toISOString().slice(0,10) });
         await syncAchievements({ focusSessions: focusCount, tasksCompleted: 0, habitsCompleted: (habits || []).length });
         toast({ title: "Focus complete! +20 XP", description: `Nice work. Time for a ${cfg.break} min break.` });
         setPhase("break");

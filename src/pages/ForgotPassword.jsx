@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { appApi } from "@/api/appClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -18,7 +18,7 @@ export default function ForgotPassword() {
     setLoading(true);
     setError("");
     try {
-      await base44.auth.resetPasswordRequest(email);
+      await appApi.auth.resetPasswordRequest(email);
       setSent(true);
     } catch {
       setError("We couldn't request a reset email. Please check your connection and try again.");

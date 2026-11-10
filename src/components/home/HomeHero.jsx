@@ -1,6 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { Flame, Timer, CheckCircle2, Target } from "lucide-react";
+import { Flame, Timer, CheckCircle2 } from "lucide-react";
 import CircularProgress from "@/components/CircularProgress";
 import { useProfile } from "@/lib/profileContext";
 
