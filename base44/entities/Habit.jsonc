@@ -1,0 +1,56 @@
+{
+  "name": "Habit",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "title": "Name"
+    },
+    "frequency": {
+      "type": "string",
+      "enum": [
+        "daily",
+        "weekly"
+      ],
+      "default": "daily",
+      "title": "Frequency"
+    },
+    "color": {
+      "type": "string",
+      "default": "indigo",
+      "title": "Color"
+    },
+    "icon": {
+      "type": "string",
+      "default": "Check",
+      "title": "Icon"
+    },
+    "target_per_week": {
+      "type": "number",
+      "default": 7,
+      "title": "Target Per Week"
+    },
+    "active": {
+      "type": "boolean",
+      "default": true,
+      "title": "Active"
+    }
+  },
+  "required": [
+    "name"
+  ],
+  "rls": {
+    "read": {
+      "created_by_id": "{{user.id}}"
+    },
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}

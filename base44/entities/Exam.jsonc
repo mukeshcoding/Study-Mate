@@ -1,0 +1,50 @@
+{
+  "name": "Exam",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "title": "Title"
+    },
+    "subject_id": {
+      "type": "string",
+      "title": "Subject Id"
+    },
+    "subject_name": {
+      "type": "string",
+      "title": "Subject Name"
+    },
+    "exam_date": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Exam Date"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes"
+    },
+    "completed": {
+      "type": "boolean",
+      "default": false,
+      "title": "Completed"
+    }
+  },
+  "required": [
+    "title",
+    "exam_date"
+  ],
+  "rls": {
+    "read": {
+      "created_by_id": "{{user.id}}"
+    },
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}

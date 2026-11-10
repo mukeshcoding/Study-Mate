@@ -1,0 +1,54 @@
+{
+  "name": "StudySession",
+  "type": "object",
+  "properties": {
+    "subject_id": {
+      "type": "string",
+      "title": "Subject Id"
+    },
+    "subject_name": {
+      "type": "string",
+      "title": "Subject Name"
+    },
+    "duration_minutes": {
+      "type": "number",
+      "title": "Duration Minutes"
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Started At"
+    },
+    "completed_at": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Completed At"
+    },
+    "preset": {
+      "type": "string",
+      "title": "Preset"
+    },
+    "completed": {
+      "type": "boolean",
+      "default": true,
+      "title": "Completed"
+    }
+  },
+  "required": [
+    "duration_minutes"
+  ],
+  "rls": {
+    "read": {
+      "created_by_id": "{{user.id}}"
+    },
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}
